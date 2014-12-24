@@ -1,5 +1,5 @@
 This repo is intended to hold miscellaneous scripts/application/poc
-brances for openstack related work.
+branches for openstack related work.
 
 Do not add any other file to the master branch.
 
