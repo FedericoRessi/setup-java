@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
+import os
 from os import path
+import sys
+import tempfile
 import unittest
 
 import vagrant
@@ -31,12 +34,23 @@ class SetupJavaTestCase(unittest.TestCase):
             java_version=self.JAVA_VERSION, vm_name="centos7")
 
     def _test_setup_java(self, java_version, vm_name):
-        vm = vagrant.Vagrant(path.dirname(__file__))
-        vm.up(vm_name=vm_name)
-        # pylint: disable=protected-access
-        vm._run_vagrant_command(
-            ['ssh', vm_name, '-c',
-             '/vagrant/setup_java/tests/test_setup_java.sh', java_version])
+        log_file = tempfile.mktemp()
+        self.addCleanup(lambda: os.remove(log_file))
+        print 'For details see log file: ', log_file
+        try:
+            log_cm = vagrant.make_file_cm(log_file)
+            vm = vagrant.Vagrant(
+                root=path.dirname(__file__), out_cm=log_cm, err_cm=log_cm)
+            vm.up(vm_name=vm_name)
+            vm._run_vagrant_command(  # pylint: disable=protected-access
+                ['ssh', vm_name, '-c',
+                 '/vagrant/setup_java/tests/test_setup_java.sh', java_version])
+
+        except Exception:
+            with open(log_file, 'r') as f:
+                for l in f:
+                    sys.stderr.write(l)
+            raise
 
 
 class TestSetupJava7(SetupJavaTestCase):
