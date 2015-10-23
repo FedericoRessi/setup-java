@@ -35,8 +35,8 @@ class SetupJavaTestCase(unittest.TestCase):
         vm.up(vm_name=vm_name)
         # pylint: disable=protected-access
         vm._run_vagrant_command(
-            ['ssh', vm_name, '-c', '/vagrant/test_setup_java.sh',
-             java_version])
+            ['ssh', vm_name, '-c',
+             '/vagrant/setup_java/tests/test_setup_java.sh', java_version])
 
 
 class TestSetupJava7(SetupJavaTestCase):
