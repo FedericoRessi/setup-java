@@ -35,6 +35,8 @@ class SetupJavaTestCase(object):
             java_version=self.JAVA_VERSION, vm_name="centos7")
 
     def _test_setup_java(self, java_version, vm_name):
+        # pylint: disable=protected-access
+        # pylint: disable=no-member
         log_file = tempfile.mktemp()
         self.addCleanup(lambda: os.remove(log_file))
         print 'For details see log file: ', log_file
@@ -44,7 +46,7 @@ class SetupJavaTestCase(object):
                 root=path.dirname(__file__), out_cm=log_cm, err_cm=log_cm)
             self.addCleanup(lambda: vm.destroy(vm_name=vm_name))
             vm.up(vm_name=vm_name)
-            vm._run_vagrant_command(  # pylint: disable=protected-access
+            vm._run_vagrant_command(
                 ['ssh', vm_name, '-c',
                  '/vagrant/setup_java/tests/test_setup_java.sh ' +
                  java_version])
