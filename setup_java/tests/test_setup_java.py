@@ -41,6 +41,7 @@ class SetupJavaTestCase(unittest.TestCase):
             log_cm = vagrant.make_file_cm(log_file)
             vm = vagrant.Vagrant(
                 root=path.dirname(__file__), out_cm=log_cm, err_cm=log_cm)
+            self.addCleanup(lambda: vm.destroy(vm_name=vm_name))
             vm.up(vm_name=vm_name)
             vm._run_vagrant_command(  # pylint: disable=protected-access
                 ['ssh', vm_name, '-c',
