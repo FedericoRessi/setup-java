@@ -10,7 +10,7 @@ import unittest
 import vagrant
 
 
-class SetupJavaTestCase(unittest.TestCase):
+class SetupJavaTestCase(object):
 
     JAVA_VERSION = None
 
@@ -57,11 +57,11 @@ class SetupJavaTestCase(unittest.TestCase):
             raise
 
 
-class TestSetupJava7(SetupJavaTestCase):
+class TestSetupJava7(SetupJavaTestCase, unittest.TestCase):
 
     JAVA_VERSION = '7'
 
 
-class TestSetupJava8(SetupJavaTestCase):
+class TestSetupJava8(SetupJavaTestCase, unittest.TestCase):
 
     JAVA_VERSION = '8'
