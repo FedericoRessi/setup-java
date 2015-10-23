@@ -4,6 +4,7 @@ import os
 from os import path
 import sys
 import tempfile
+import traceback
 import unittest
 
 import vagrant
@@ -45,12 +46,14 @@ class SetupJavaTestCase(unittest.TestCase):
             vm.up(vm_name=vm_name)
             vm._run_vagrant_command(  # pylint: disable=protected-access
                 ['ssh', vm_name, '-c',
-                 '/vagrant/setup_java/tests/test_setup_java.sh', java_version])
+                 '/vagrant/setup_java/tests/test_setup_java.sh ' +
+                 java_version])
 
         except Exception:
             with open(log_file, 'r') as f:
                 for l in f:
                     sys.stderr.write(l)
+            traceback.print_exc()
             raise
 
 
