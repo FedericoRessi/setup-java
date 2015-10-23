@@ -14,11 +14,11 @@ Vagrant.configure(2) do |config|
   # boxes at https://atlas.hashicorp.com/search.
 
   boxes = [
-    ["ubuntu1404", "ubuntu/trusty64"],
-    ["ubuntu1504", "ubuntu/vivid64"],
+    ["trusty", "ubuntu/trusty64"],
+    ["vivid", "ubuntu/vivid64"],
     ["fedora21", "box-cutter/fedora21"],
     ["fedora22", "box-cutter/fedora22"],
-    ["centos7", "puppetlabs/centos-7.0-64-nocm"]]
+    ["centos7", "centos/7"]]
 
   boxes.each do |name, box|
     config.vm.define name do |c|
@@ -26,7 +26,7 @@ Vagrant.configure(2) do |config|
       c.vm.network :forwarded_port, guest: 22, host: 20000 + rand(10000),
         id: "ssh", auto_correct: true
       c.vm.network :forwarded_port, guest: 80, host: 8000 + rand(5000),
-        id: "ssh", auto_correct: true
+        id: "http", auto_correct: true
     end
   end
  
@@ -87,50 +87,6 @@ Vagrant.configure(2) do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
-    #!/bin/bash -xe
-
-    set -ex
-
-    if apt-get --version; then
-      apt-get update -y
-      apt-get install -y git realpath
-      function is_ubuntu {
-        return 0
-      }
-
-    elif dnf --version; then
-      dnf install -y git
-      function is_ubuntu {
-        return 1
-      }
-
-    elif yum --version; then
-      yum install -y git
-      function is_ubuntu {
-        return 1
-      }
-
-    fi
-
-    cd /vagrant
-
-    if ! cd networking-odl; then
-        git clone http://git.openstack.org/openstack/networking-odl -b master
-        cd networking-odl
-        git fetch http://review.openstack.org/openstack/networking-odl refs/changes/10/218210/18
-        git rebase origin/master FETCH_HEAD
-        git checkout -b bug/1467949
-    fi
-
-    source devstack/setup_java.sh
-
-    for VERSION in 7 8; do
-      setup_java $VERSION 
-      test_java_version java $VERSION
-      [[ "$JAVA" == "$(realpath $(which java))" ]]
-      find "$JAVA_HOME" -name java | grep "$JAVA"
-      [[ "$(basename $JAVA_HOME)" != "jre" ]]
-    done
-
+    /bin/bash /vagrant/provision.sh
   SHELL
 end
