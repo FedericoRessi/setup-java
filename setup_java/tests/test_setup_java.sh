@@ -1,10 +1,10 @@
 #!/bin/bash
 
-JAVA_VERSION=${JAVA_VERSION:$1}
-
 set -ex
 
-if apt-get --version; then
+JAVA_VERSION=${JAVA_VERSION:-$1}
+
+if apt-get --version > /dev/null; then
     function is_ubuntu {
         return 0
     }

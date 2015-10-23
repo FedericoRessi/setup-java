@@ -26,6 +26,7 @@ class SetupJavaTestCase(unittest.TestCase):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="fedora22")
 
+    @unittest.skip('Invalid vagrant box.')
     def test_setup_java_on_centos7(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="centos7")

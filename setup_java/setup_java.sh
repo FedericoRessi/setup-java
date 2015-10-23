@@ -21,8 +21,12 @@ function setup_java {
         echo "Some Java version $VERSION has been installed and selected."
 
     else
-        echo "ERROR: Unable to setup Java version $VERSION!"
+        echo "ERROR: Unable to setup Java version $VERSION."
         return 1
+    fi
+
+    if ! setup_java_env; then
+        echo "ERROR: Unable to setup java $VERSION enviroment."
     fi
 
     return 0
@@ -65,9 +69,7 @@ function select_java {
         if test_java_version "$COMMAND" "$VERSION"; then
             if select_installed_java_command "$COMMAND"; then
                 if test_java_version java "$VERSION"; then
-                    if setup_java_env "$COMMAND"; then
-                        return 0
-                    fi
+                    return 0
                 fi
             fi
         fi
