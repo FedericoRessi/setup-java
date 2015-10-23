@@ -10,24 +10,23 @@ class SetupJavaTestCase(unittest.TestCase):
 
     JAVA_VERSION = None
 
-    def test_setup_java_on_trusty(self):
+    def test_setup_java_on_ubuntu_trusty(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="trusty")
 
-    def test_setup_java_on_vivid(self):
+    def test_setup_java_on_ubuntu_vivid(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="vivid")
 
-    def test_setup_java_on_fedora21(self):
+    def test_setup_java_on_fedora_21(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="fedora21")
 
-    def test_setup_java_on_fedora22(self):
+    def test_setup_java_on_fedora_22(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="fedora22")
 
-    @unittest.skip('Invalid vagrant box.')
-    def test_setup_java_on_centos7(self):
+    def test_setup_java_on_centos_7(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="centos7")
 

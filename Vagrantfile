@@ -18,7 +18,7 @@ Vagrant.configure(2) do |config|
     ["vivid", "ubuntu/vivid64"],
     ["fedora21", "box-cutter/fedora21"],
     ["fedora22", "box-cutter/fedora22"],
-    ["centos7", "puppetlabs/centos7"]]
+    ["centos7", "puppetlabs/centos-7.0-64-nocm"]]
 
   boxes.each do |name, box|
     config.vm.define name do |c|
