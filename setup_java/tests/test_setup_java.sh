@@ -9,6 +9,8 @@ if apt-get --version > /dev/null; then
         return 0
     }
 
+    sudo apt-get install -y realpath
+
 else
     function is_ubuntu {
         return 1
