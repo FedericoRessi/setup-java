@@ -43,15 +43,15 @@ function setup_java_env() {
         return 1
     fi
 
-    local ENV_FILE="$(mktemp)"
-    echo 'export JAVA=$(readlink -f '$JAVA_LINK')' >> "$ENV_FILE"
-    echo 'export JAVA_HOME=$(echo $JAVA | sed "s:/bin/java::" | sed "s:/jre::")' >> "$ENV_FILE"
-    if ! source "$ENV_FILE"; then
-        return 1
-    fi
+    export JAVA="$(readlink -f $JAVA_LINK)"
+    export JAVA_HOME=$(echo $JAVA | sed "s:/bin/java::" | sed "s:/jre::")
 
-    # make JAVA and JAVA_HOME variables persistent
-    sudo mv "$ENV_FILE" /etc/profile.d/00-java.sh
+    if ! grep "export JAVA_HOME=${JAVA_HOME}" /etc/profile.d/*; then
+        # make JAVA_HOME variables persistent
+        local ENV_FILE="$(mktemp)"
+        echo "export JAVA_HOME=${JAVA_HOME}" > ${ENV_FILE}
+        sudo mv "$ENV_FILE" /etc/profile.d/z99-java.sh
+    fi
 
     echo "JAVA is: $JAVA"
     echo "JAVA_HOME is: $JAVA_HOME"
@@ -104,19 +104,20 @@ if is_ubuntu; then
     function install_other_java {
         local VERSION="$1"
         local PPA_REPOSITORY="ppa:webupd8team/java"
-        local JAVA_PACKAGE="oracle-java$VERSION-installer"
+        local JAVA_INSTALLER="oracle-java${VERSION}-installer'
+        local JAVA_PACKAGES="$JAVA_INSTALLER oracle-java${VERSION}-set-default"
 
         # Accept installer license
-        echo "$JAVA_PACKAGE" shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+        echo "$JAVA_INSTALLER" shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
 
-        if sudo apt-get install -y "$JAVA_PACKAGE"; then
+        if sudo apt-get install -y "$JAVA_PACKAGES" ; then
             return 0
         fi
 
         # Add PPA only when package is not available
         if sudo apt-get install -y software-properties-common; then
             if echo | sudo add-apt-repository "$PPA_REPOSITORY"; then
-                if sudo apt-get update && sudo apt-get install -y "$JAVA_PACKAGE"; then
+                if sudo apt-get update && sudo apt-get install -y "$JAVA_PACKAGES"; then
                     return 0
                 fi
             fi
