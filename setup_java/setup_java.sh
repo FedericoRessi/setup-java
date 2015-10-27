@@ -105,19 +105,19 @@ if is_ubuntu; then
         local VERSION="$1"
         local PPA_REPOSITORY="ppa:webupd8team/java"
         local JAVA_INSTALLER="oracle-java${VERSION}-installer"
-        local JAVA_PACKAGES="${JAVA_INSTALLER} oracle-java${VERSION}-set-default"
+        local JAVA_PACKAGES=${JAVA_INSTALLER} oracle-java${VERSION}-set-default
 
         # Accept installer license
         echo "$JAVA_INSTALLER" shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
 
-        if sudo apt-get install -y "$JAVA_PACKAGES" ; then
+        if sudo apt-get install -y $JAVA_PACKAGES ; then
             return 0
         fi
 
         # Add PPA only when package is not available
         if sudo apt-get install -y software-properties-common; then
             if echo | sudo add-apt-repository "$PPA_REPOSITORY"; then
-                if sudo apt-get update && sudo apt-get install -y "$JAVA_PACKAGES"; then
+                if sudo apt-get update && sudo apt-get install -y $JAVA_PACKAGES; then
                     return 0
                 fi
             fi
