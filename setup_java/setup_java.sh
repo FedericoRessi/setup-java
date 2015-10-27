@@ -104,8 +104,8 @@ if is_ubuntu; then
     function install_other_java {
         local VERSION="$1"
         local PPA_REPOSITORY="ppa:webupd8team/java"
-        local JAVA_INSTALLER="oracle-java${VERSION}-installer'
-        local JAVA_PACKAGES="$JAVA_INSTALLER oracle-java${VERSION}-set-default"
+        local JAVA_INSTALLER="oracle-java${VERSION}-installer"
+        local JAVA_PACKAGES="${JAVA_INSTALLER} oracle-java${VERSION}-set-default"
 
         # Accept installer license
         echo "$JAVA_INSTALLER" shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
