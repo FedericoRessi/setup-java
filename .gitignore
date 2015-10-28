@@ -1,0 +1,4 @@
+*.pyc
+.vagrant/
+.tox/
+setup_java.egg-info/
