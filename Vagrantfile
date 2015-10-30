@@ -1,64 +1,56 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
+# --- VMs configuration -------------------------------------------------------
+
+# number of CPUs for every VM
+vm_cpus = 1
+
+# megabytes of RAM for every VM
+vm_memory = 256
+
+# available VM images
+vm_images = [
+  ["trusty", "ubuntu/trusty64"],
+  ["vivid", "ubuntu/vivid64"],
+  ["fedora21", "box-cutter/fedora21"],
+  ["fedora22", "box-cutter/fedora22"],
+  ["centos7", "puppetlabs/centos-7.0-64-nocm"]]
+
+vm_provision_script = "scripts/provision.sh"
+
+vm_provision_args = ""
+
+# --- vagrant meal ------------------------------------------------------------
+
 Vagrant.configure(2) do |config|
-  # The most common configuration options are documented and commented below.
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
 
-  # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://atlas.hashicorp.com/search.
+  # For every available VM image
+  vm_images.each do |vm_name, vm_image|
 
-  boxes = [
-    ["trusty", "ubuntu/trusty64"],
-    ["vivid", "ubuntu/vivid64"],
-    ["fedora21", "box-cutter/fedora21"],
-    ["fedora22", "box-cutter/fedora22"],
-    ["centos7", "puppetlabs/centos-7.0-64-nocm"]]
+    config.vm.define vm_name do |conf|
+      conf.vm.box = vm_image
 
-  boxes.each do |name, box|
-    config.vm.define name do |c|
-      c.vm.box = box
-      c.vm.network :forwarded_port, guest: 22, host: 20000 + rand(10000),
+      # assign a different random port to every vm instance
+      # this avoid concurrency problems when running tests in parallel
+      conf.vm.network :forwarded_port, guest: 22, host: 22000 + rand(1000),
         id: "ssh", auto_correct: true
-      c.vm.network :forwarded_port, guest: 80, host: 8000 + rand(5000),
+      conf.vm.network :forwarded_port, guest: 80, host: 8000 + rand(1000),
         id: "http", auto_correct: true
     end
   end
- 
-  # Disable automatic box update checking. If you disable this, then
-  # boxes will only be checked for updates when the user runs
-  # `vagrant box outdated`. This is not recommended.
-  # config.vm.box_check_update = false
 
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
-
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-  # config.vm.network "private_network", ip: "192.168.33.10"
-
-  # Create a public network, which generally matched to bridged network.
-  # Bridged networks make the machine appear as another physical device on
-  # your network.
-  # config.vm.network "public_network"
-
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
+  # Specific VirtualBox paramters
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
-    vb.memory = 512
-    vb.cpus = 1
+    vb.memory = vm_memory
+    vb.cpus = vm_cpus
   end
 
-  if Vagrant.has_plugin?("vagrant-vbguest")
-    config.vbguest.auto_update = false
+  # Provision project script
+  config.vm.provision "shell" do |script|
+    script.path = vm_provision_script
+    script.args = vm_provision_args
   end
 
 end
