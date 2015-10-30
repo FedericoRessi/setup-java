@@ -7,7 +7,7 @@
 vm_cpus = 1
 
 # megabytes of RAM for every VM
-vm_memory = 256
+vm_memory = 1024
 
 # available VM images
 vm_images = [

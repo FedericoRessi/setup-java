@@ -20,7 +20,7 @@ elif [ -r /etc/os-release ]; then
     # Redhat way
     DISTRIB_ID="$(read_variable /etc/os-release ID)"
     DISTRIB_RELEASE="$(read_variable /etc/os-release VERSION_ID)"
-    DISTRIB_CODENAME="$(read_variable /etc/os-release ID)-$DISTRIB_RELEASE"
+    DISTRIB_CODENAME="$(read_variable /etc/os-release ID)$DISTRIB_RELEASE"
     DISTRIB_DESCRIPTION="$(read_variable /etc/os-release PRETTY_NAME)"
 
 else
