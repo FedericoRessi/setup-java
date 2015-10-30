@@ -30,6 +30,7 @@ Vagrant.configure(2) do |config|
 
     config.vm.define vm_name do |conf|
       conf.vm.box = vm_image
+      conf.vm.hostname = vm_name
 
       # assign a different random port to every vm instance
       # this avoid concurrency problems when running tests in parallel
