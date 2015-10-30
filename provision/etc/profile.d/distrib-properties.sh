@@ -19,7 +19,7 @@ if [ -r  /etc/lsb-release ]; then
     export DISTRIB_CODENAME=$(read_variable /etc/lsb-release DISTRIB_CODENAME)
     export DISTRIB_DESCRIPTION=$(read_variable /etc/lsb-release DISTRIB_DESCRIPTION)
 
-elif [ -r /etc/os-releaser ]; then
+elif [ -r /etc/os-release ]; then
     # Redhat way
     export DISTRIB_ID=$(read_variable /etc/os-release NAME)
     export DISTRIB_RELEASE=$(read_variable /etc/os-release VERSION)
@@ -28,15 +28,18 @@ elif [ -r /etc/os-releaser ]; then
 
 fi
 
-if which apt-get ; then
+if which apt-get 2> /dev/null; then
     export DISTRIB_INSTALLER="apt-get install -y"
 
-elif which dnf ; then
+elif which dnf 2> /dev/null; then
     export DISTRIB_INSTALLER="dnf install -y"
 
-elif which yum ; then
+elif which yum 2> /dev/null; then
     export DISTRIB_INSTALLER="yum install -y"
 
+else
+    echo "Unsupported distribution."
+    cat /etc/*-release
 fi
 
 function is_ubuntu {
@@ -54,4 +57,3 @@ function is_redhat {
 function install_package {
     $DISTRIB_INSTALLER "$@"
 }
-
