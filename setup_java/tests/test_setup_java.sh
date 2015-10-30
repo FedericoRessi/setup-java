@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source /etc/profile
+
 set -ex
 
 JAVA_VERSION=${JAVA_VERSION:-$1}

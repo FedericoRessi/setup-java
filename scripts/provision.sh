@@ -1,8 +1,7 @@
 #!/bin/bash -e
 
-source /vagrant/provision/etc/profile.d/*.sh
-
-install_package rsync
-
 # Copy configuration files
-rsync -ua /vagrant/provision/* /
+cp -fR /vagrant/provision/* /
+
+# Verify integrity of bash profile
+bash -e /etc/profile
