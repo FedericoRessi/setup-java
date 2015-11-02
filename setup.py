@@ -22,10 +22,8 @@ setup(
     author='Federico Ressi',
     # author_email='federico.ressi@intel.com',
     classifiers=[
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: Apache Software License',
         'Development Status :: 4 - Beta',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4', ],
+        'Programming Language :: Python :: 2.7'],
     packages=['setup_java'], )
