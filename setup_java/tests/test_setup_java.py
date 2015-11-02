@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
+import contextlib
+import datetime
 import os
 from os import path
 import sys
-import tempfile
 import traceback
 import unittest
 
@@ -36,41 +37,85 @@ class SetupJavaTestCase(object):
 
     def _test_setup_java(self, java_version, vm_name):
         # pylint: disable=protected-access
-        # pylint: disable=no-member
-        log_file = tempfile.mktemp()
-        self.addCleanup(lambda: os.remove(log_file))
-        log_cm = vagrant.make_file_cm(log_file)
 
-        vm = vagrant.Vagrant(
-            root=path.dirname(__file__), out_cm=log_cm, err_cm=log_cm)
-        print 'For details see log file: ', log_file
-        try:
-
-            self._destroy_vm(vm=vm, vm_name=vm_name)
-
+        with self._create_vm(vm_name) as vm:
             vm.up(vm_name=vm_name)
-            vm._run_vagrant_command(
+
+            # execute setup java
+            vm._call_vagrant_command(
                 ['ssh', vm_name, '-c',
                  '/vagrant/setup_java/tests/test_setup_java.sh ' +
                  java_version])
-            vm.halt(vm_name=vm_name)
 
+            # reboot
+            vm.halt(vm_name=vm_name)
             vm.up(vm_name=vm_name)
-            vm._run_vagrant_command(
+
+            # verify environment after reboot
+            vm._call_vagrant_command(
                 ['ssh', vm_name, '-c',
                  '/vagrant/setup_java/tests/test_setup_java_after_reboot.sh ' +
                  java_version])
 
-        except BaseException:
-            vm.suspend(vm_name=vm_name)
-            with open(log_file, 'r') as f:
+    @contextlib.contextmanager
+    def _create_vm(self, vm_name):
+        # pylint: disable=broad-except
+
+        with self._get_log_context_manager() as log_context_manager:
+            vm = vagrant.Vagrant(
+                root=path.dirname(__file__), out_cm=log_context_manager,
+                err_cm=log_context_manager)
+
+            try:
+                self._destroy_vm(vm=vm, vm_name=vm_name)
+
+                yield vm
+
+            except BaseException:
+                try:
+                    vm.suspend(vm_name=vm_name)
+
+                except Exception:
+                    traceback.print_exc()
+
+                raise
+
+            else:
+                try:
+                    self._destroy_vm(vm, vm_name)
+
+                except Exception:
+                    traceback.print_exc()
+
+    @contextlib.contextmanager
+    def _get_log_context_manager(self, mode='a'):
+        # pylint: disable=no-member
+        log_timestamp = datetime.datetime.now().isoformat()
+        if not path.isdir('logs'):
+            os.mkdir('logs')
+        log_file_name = path.join(
+            'logs', '{}-{}.log').format(log_timestamp, self.id())
+
+        sys.stderr.write(
+            '\nFor details read log file: {}\n'.format(log_file_name))
+
+        log_fd = open(log_file_name, mode=mode)
+        self.addCleanup(log_fd.close)
+
+        @contextlib.contextmanager
+        def log_context_manager():
+            yield log_fd
+
+        try:
+            yield log_context_manager
+
+        except Exception:
+            log_fd.flush()
+            with open(log_file_name, 'r') as f:
                 for l in f:
                     sys.stderr.write(l)
             traceback.print_exc()
             raise
-
-        else:
-            self._destroy_vm(vm, vm_name)
 
     def _destroy_vm(self, vm, vm_name):
         # pylint: disable=no-member
