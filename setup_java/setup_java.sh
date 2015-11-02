@@ -3,8 +3,8 @@
 function setup_java {
     local VERSION="$1"
     if [[ "$VERSION" == "" ]]; then
-        # It should be OK in most of the cases
-        VERSION=7
+         # This is know being the last know stable version of Java
+        VERSION=8
     fi
 
     echo "Setup Java version: $VERSION"
