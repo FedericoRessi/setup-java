@@ -118,7 +118,7 @@ if is_ubuntu; then
         # Add PPA only when package is not available
         if install_package software-properties-common; then
             # I pipe this after echo to emulate an user key-press
-            if echo | install_package "$PPA_REPOSITORY"; then
+            if echo | sudo add-apt-repository "$PPA_REPOSITORY"; then
                 if sudo apt-get update; then
                     if install_package $JAVA_INSTALLER ; then
                         if install_package $JAVA_SET_DEFAULT ; then
