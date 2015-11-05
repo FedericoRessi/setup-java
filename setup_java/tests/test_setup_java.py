@@ -43,6 +43,7 @@ class SetupJavaTestCase(object):
     def _test_setup_java(self, java_version, vm_name):
         # pylint: disable=protected-access
 
+        java_version = str(java_version)
         with self._create_vm(vm_name) as vm:
             vm.up(vm_name=vm_name)
 
