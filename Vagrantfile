@@ -16,6 +16,7 @@ vm_images = [
   ["wily", "ubuntu/wily64"],
   ["fedora21", "box-cutter/fedora21"],
   ["fedora22", "box-cutter/fedora22"],
+  ["fedora23", "box-cutter/fedora23"],
   ["centos7", "puppetlabs/centos-7.0-64-nocm"]]
 
 vm_provision_script = "scripts/provision.sh"
