@@ -1,25 +1,25 @@
 #!/bin/bash
 
+ORACLE_JAVA_URL="http://download.oracle.com/otn-pub/java/jdk"
+ORACLE_JAVA7_URL="${LAST_ORACLE_JAVA7_URL:-$ORACLE_JAVA_URL/7u80-b15/jdk-7u80}"
+ORACLE_JAVA7_NAME="jdk1.7.0_80"
+ORACLE_JAVA8_URL="${LAST_ORACLE_JAVA8_URL:-$ORACLE_JAVA_URL/8u60-b27/jdk-8u60}"
+ORACLE_JAVA8_NAME="jdk1.8.0_60"
+
+
 function setup_java {
-    local VERSION="$1"
-    if [[ "$VERSION" == "" ]]; then
-         # This is know being the last know stable version of Java
-        VERSION=8
-    fi
+    # Java version 8 is the last stable one
+    local VERSION="${1:-8}"
 
     echo "Setup Java version: $VERSION"
     if test_java_version java "$VERSION"; then
         echo "Current Java version is already $VERSION."
-
     elif select_java "$VERSION"; then
         echo "Java version $VERSION has been selected."
-
     elif install_openjdk "$VERSION" && select_java "$VERSION"; then
         echo "OpenJDK version $VERSION has been installed and selected."
-
     elif install_other_java "$VERSION" && select_java "$VERSION"; then
         echo "Some Java version $VERSION has been installed and selected."
-
     else
         echo "ERROR: Unable to setup Java version $VERSION."
         return 1
@@ -33,10 +33,7 @@ function setup_java {
 }
 
 function setup_java_env() {
-    local JAVA_COMMAND="$1"
-    if [[ "$JAVA_COMMAND" == "" ]]; then
-        JAVA_COMMAND="java"
-    fi
+    local JAVA_COMMAND="${1:-java}"
 
     JAVA_LINK="$(which $JAVA_COMMAND)"
     if [[ "$JAVA_LINK" == "" ]]; then
@@ -98,7 +95,7 @@ if is_ubuntu; then
 
     function install_openjdk {
         local REQUIRED_VERSION="$1"
-        sudo apt-get install -y "openjdk-$REQUIRED_VERSION-jre-headless"
+        install_package "openjdk-$REQUIRED_VERSION-jre-headless"
     }
 
     function install_other_java {
@@ -110,18 +107,21 @@ if is_ubuntu; then
         # Accept installer license
         echo "$JAVA_INSTALLER" shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
 
-        if sudo apt-get install -y $JAVA_INSTALLER ; then
-            if sudo apt-get install -y $JAVA_SET_DEFAULT ; then
-                return 0
+        # Remove all existing set-default versions
+        sudo apt-get remove -y oracle-java*-set-default
+        if install_package $JAVA_INSTALLER ; then
+            if install_package $JAVA_SET_DEFAULT ; then
+                return 0  # Some PPA was already providing desired packages
             fi
         fi
 
         # Add PPA only when package is not available
-        if sudo apt-get install -y software-properties-common; then
-            if echo | sudo add-apt-repository "$PPA_REPOSITORY"; then
+        if install_package software-properties-common; then
+            # I pipe this after echo to emulate an user key-press
+            if echo | install_package "$PPA_REPOSITORY"; then
                 if sudo apt-get update; then
-                    if sudo apt-get install -y $JAVA_INSTALLER ; then
-                        if sudo apt-get install -y $JAVA_SET_DEFAULT ; then
+                    if install_package $JAVA_INSTALLER ; then
+                        if install_package $JAVA_SET_DEFAULT ; then
                             return 0
                         fi
                     fi
@@ -129,11 +129,12 @@ if is_ubuntu; then
             fi
         fi
 
+        # Something has gone wrong!
         return 1
     }
 
 else
-    # --- Fedora -------------------------------------------------------------
+    # --- Red Hat -------------------------------------------------------------
 
     function list_java_commands {
          alternatives --display java 2>&1 | grep -v '^[[:space:]]' | awk '/[[:space:]]- priority[[:space:]]/{print $1}'
@@ -141,7 +142,7 @@ else
 
     function install_openjdk {
         local VERSION="$1"
-        sudo yum install -y java-1.$VERSION.*-openjdk-headless
+        install_package java-1.$VERSION.*-openjdk-headless
     }
 
     function install_other_java {
@@ -154,14 +155,11 @@ else
         fi
 
         if [[ "$VERSION" == 7 ]]; then
-
-            local ORIGIN="7u80-b15/jdk-7u80"
-            local TARGET="jdk1.7.0_80"
-
+            ORIGIN=$ORACLE_JAVA7_URL
+            TARGET=$ORACLE_JAVA7_NAME
         elif [[ "$VERSION" == 8 ]]; then
-            local ORIGIN="8u60-b27/jdk-8u60"
-            local TARGET="jdk1.8.0_60"
-
+            ORIGIN=$ORACLE_JAVA8_URL
+            TARGET=$ORACLE_JAVA8_NAME
         else
             echo "Unsupported Java version: $VERSION."
             return 1
@@ -179,13 +177,13 @@ else
         local HEADER="Cookie: oraclelicense=accept-securebackup-cookie"
 
         for EXT in "rpm" "tar.gz"; do
-            local URL="http://download.oracle.com/otn-pub/java/jdk/$ORIGIN-$ARCH.$EXT"
+            local URL="$ORIGIN-$ARCH.$EXT"
             local PACKAGE="/tmp/$(basename $URL)"
 
             if wget $WGET_OPTIONS --header "$HEADER" "$URL" -O "$PACKAGE"; then
                 case "$EXT" in
                     "rpm")
-                        sudo rpm -i $PACKAGE
+                        sudo rpm -i "$PACKAGE"
                         ;;
                     "tar.gz")
                         sudo mkdir -p /usr/java && sudo tar -C /usr/java -xzf "$PACKAGE"
