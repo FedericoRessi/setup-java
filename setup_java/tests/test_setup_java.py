@@ -5,6 +5,7 @@ import datetime
 import os
 from os import path
 import sys
+import time
 import traceback
 import unittest
 
@@ -61,6 +62,7 @@ class SetupJavaTestCase(object):
 
             # reboot
             vm.halt(vm_name=vm_name)
+            time.sleep(5.)
             vm.up(vm_name=vm_name)
 
             # verify environment after reboot
