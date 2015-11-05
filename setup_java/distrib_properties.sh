@@ -65,5 +65,5 @@ function is_centos {
 }
 
 function install_package {
-    $DISTRIB_INSTALLER "$@"
+    sudo $DISTRIB_INSTALLER "$@"
 }
