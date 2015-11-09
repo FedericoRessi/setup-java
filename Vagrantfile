@@ -11,6 +11,7 @@ vm_memory = 1024
 
 # available VM images
 vm_images = [
+  ["precise", "ubuntu/precise64"],
   ["trusty", "ubuntu/trusty64"],
   ["vivid", "ubuntu/vivid64"],
   ["wily", "ubuntu/wily64"],
