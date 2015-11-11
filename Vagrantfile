@@ -37,10 +37,8 @@ Vagrant.configure(2) do |config|
 
       # assign a different random port to every vm instance
       # this avoid concurrency problems when running tests in parallel
-      conf.vm.network :forwarded_port, guest: 22, host: 22000 + rand(10000),
+      conf.vm.network :forwarded_port, guest: 22, host: 22000 + rand(9999),
         id: "ssh", auto_correct: true
-      conf.vm.network :forwarded_port, guest: 80, host: 8000 + rand(10000),
-        id: "http", auto_correct: true
     end
   end
 
