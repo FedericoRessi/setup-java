@@ -25,10 +25,6 @@ function setup_java {
         return 1
     fi
 
-    if ! setup_java_env; then
-        echo "ERROR: Unable to setup java $VERSION enviroment."
-    fi
-
     return 0
 }
 
@@ -42,13 +38,6 @@ function setup_java_env() {
 
     export JAVA="$(readlink -f $JAVA_LINK)"
     export JAVA_HOME=$(echo $JAVA | sed "s:/bin/java::" | sed "s:/jre::")
-
-    if ! grep "export JAVA_HOME=${JAVA_HOME}" /etc/profile.d/*; then
-        # make JAVA_HOME variables persistent
-        local ENV_FILE="$(mktemp)"
-        echo "export JAVA_HOME=${JAVA_HOME}" > ${ENV_FILE}
-        sudo mv "$ENV_FILE" /etc/profile.d/z99-java.sh
-    fi
 
     echo "JAVA is: $JAVA"
     echo "JAVA_HOME is: $JAVA_HOME"
