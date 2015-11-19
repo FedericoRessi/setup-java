@@ -5,7 +5,6 @@ import datetime
 import os
 from os import path
 import sys
-import time
 import traceback
 import unittest
 
@@ -16,7 +15,6 @@ class SetupJavaTestCase(object):
 
     JAVA_VERSION = None
 
-    #@unittest.skip('Dropping support.')
     def test_setup_java_on_ubuntu_precise(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="precise")
@@ -25,7 +23,6 @@ class SetupJavaTestCase(object):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="trusty")
 
-    #@unittest.skip('Dropping support.')
     def test_setup_java_on_ubuntu_vivid(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="vivid")
@@ -34,12 +31,10 @@ class SetupJavaTestCase(object):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="wily")
 
-    #@unittest.skip('Dropping support.')
     def test_setup_java_on_fedora_21(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="fedora21")
 
-    #@unittest.skip('Dropping support.')
     def test_setup_java_on_fedora_22(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="fedora22")
@@ -63,17 +58,6 @@ class SetupJavaTestCase(object):
             vm._call_vagrant_command(
                 ['ssh', vm_name, '-c',
                  '/vagrant/setup_java/tests/test_setup_java.sh ' +
-                 java_version])
-
-            # reboot
-            vm.halt(vm_name=vm_name)
-            time.sleep(5.)
-            vm.up(vm_name=vm_name)
-
-            # verify environment after reboot
-            vm._call_vagrant_command(
-                ['ssh', vm_name, '-c',
-                 '/vagrant/setup_java/tests/test_setup_java_after_reboot.sh ' +
                  java_version])
 
     @contextlib.contextmanager

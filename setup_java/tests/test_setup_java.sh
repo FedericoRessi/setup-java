@@ -16,3 +16,5 @@ test_java_version java $JAVA_VERSION
 [[ "$JAVA" == "$(readlink -f $(which java))" ]]
 find "$JAVA_HOME" -name java | grep "$JAVA"
 [[ "$(basename $JAVA_HOME)" != "jre" ]]
+
+echo $0": SUCCESS
