@@ -15,6 +15,7 @@ class SetupJavaTestCase(object):
 
     JAVA_VERSION = None
 
+    @unittest.skip('Obsolete.')
     def test_setup_java_on_ubuntu_precise(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="precise")
@@ -23,6 +24,7 @@ class SetupJavaTestCase(object):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="trusty")
 
+    @unittest.skip('Obsolete.')
     def test_setup_java_on_ubuntu_vivid(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="vivid")
@@ -31,6 +33,7 @@ class SetupJavaTestCase(object):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="wily")
 
+    @unittest.skip('Obsolete.')
     def test_setup_java_on_fedora_21(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="fedora21")
