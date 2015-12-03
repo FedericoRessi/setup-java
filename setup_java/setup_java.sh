@@ -84,7 +84,7 @@ if is_ubuntu; then
 
     function install_openjdk {
         local REQUIRED_VERSION="$1"
-        install_package "openjdk-$REQUIRED_VERSION-jre-headless"
+        apt-get install -y "openjdk-$REQUIRED_VERSION-jre-headless"
     }
 
     function install_other_java {
@@ -98,19 +98,19 @@ if is_ubuntu; then
 
         # Remove all existing set-default versions
         sudo apt-get remove -y oracle-java*-set-default
-        if install_package $JAVA_INSTALLER ; then
-            if install_package $JAVA_SET_DEFAULT ; then
+        if apt-get install -y $JAVA_INSTALLER ; then
+            if apt-get install -y $JAVA_SET_DEFAULT ; then
                 return 0  # Some PPA was already providing desired packages
             fi
         fi
 
         # Add PPA only when package is not available
-        if install_package software-properties-common; then
+        if apt-get install -y software-properties-common; then
             # I pipe this after echo to emulate an user key-press
             if echo | sudo add-apt-repository "$PPA_REPOSITORY"; then
                 if sudo apt-get update; then
-                    if install_package $JAVA_INSTALLER ; then
-                        if install_package $JAVA_SET_DEFAULT ; then
+                    if apt-get install -y $JAVA_INSTALLER ; then
+                        if apt-get install -y $JAVA_SET_DEFAULT ; then
                             return 0
                         fi
                     fi
@@ -131,7 +131,7 @@ else
 
     function install_openjdk {
         local VERSION="$1"
-        install_package java-1.$VERSION.*-openjdk-headless
+        yum install -y java-1.$VERSION.*-openjdk-headless
     }
 
     function install_other_java {
