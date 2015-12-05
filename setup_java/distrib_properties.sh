@@ -67,3 +67,20 @@ function is_centos {
 function install_package {
     sudo $DISTRIB_INSTALLER "$@"
 }
+
+if is_ubuntu; then
+    function apt_get {
+        local sudo
+        [[ "$(id -u)" == "0" ]] && sudo="env" || sudo = "sudo"
+
+        $sudo DEBIAN_FRONTEND=noninteractive \
+            http_proxy=${http_proxy:-} https_proxy=${https_proxy:-} \
+            no_proxy=${no_proxy:-} \
+            apt-get --option "Dpkg::Options::=--force-confold" --assume-yes "$@"
+    }
+else
+    function yum_install {
+        yum install -y "$@"
+    }
+fi
+
