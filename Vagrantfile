@@ -13,16 +13,16 @@ vm_memory = 1024
 vm_images = [
   ["precise", "ubuntu/precise64"],
   ["trusty", "ubuntu/trusty64"],
-  ["vivid", "ubuntu/vivid64"],
-  ["wily", "ubuntu/wily64"],
-  ["fedora21", "box-cutter/fedora21"],
-  ["fedora22", "box-cutter/fedora22"],
   ["fedora23", "box-cutter/fedora23"],
-  ["centos7", "puppetlabs/centos-7.0-64-nocm"]]
+  ["centos7", "puppetlabs/centos-7.2-64-nocm"]]
 
 vm_provision_script = "scripts/provision.sh"
 
 vm_provision_args = ""
+
+http_proxy = ENV["http_proxy"]
+https_proxy = ENV["https_proxy"]
+no_proxy = ENV["no_proxy"]
 
 # --- vagrant meal ------------------------------------------------------------
 
@@ -47,6 +47,19 @@ Vagrant.configure(2) do |config|
     vb.gui = false
     vb.memory = vm_memory
     vb.cpus = vm_cpus
+  end
+
+  # Configure proxy
+  if Vagrant.has_plugin?("vagrant-proxyconf")
+    if http_proxy != nil
+       config.proxy.http = http_proxy
+    end
+    if https_proxy != nil
+       config.proxy.https = https_proxy
+    end
+    if no_proxy != nil
+      config.proxy.no_proxy = no_proxy
+    end
   end
 
   # Provision project script

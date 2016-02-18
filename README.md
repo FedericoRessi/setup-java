@@ -16,14 +16,11 @@ setup_java 8  # <- replace this with 7 if you requires it
 ## Ubuntu
   - 12.04 LTS
   - 14.04 LTS
-  - 15.04
 
 ## CentOS and RHEL
-  - 7
+  - 7.2
 
 ## Fedora
-  - 21
-  - 22
   - 23
 
 
