@@ -14,8 +14,8 @@ setup_java 8  # <- replace this with 7 if you requires it
 # Supported Linux distributions
 
 ## Ubuntu
-  - 12.04 LTS
   - 14.04 LTS
+  - 16.04 LTS (planned)
 
 ## CentOS and RHEL
   - 7.2

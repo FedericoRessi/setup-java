@@ -11,8 +11,9 @@ vm_memory = 1024
 
 # available VM images
 vm_images = [
-  ["precise", "ubuntu/precise64"],
   ["trusty", "ubuntu/trusty64"],
+  ["xenial",
+   "http://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-vagrant.box"],
   ["fedora23", "box-cutter/fedora23"],
   ["centos7", "puppetlabs/centos-7.2-64-nocm"]]
 
@@ -52,10 +53,10 @@ Vagrant.configure(2) do |config|
   # Configure proxy
   if Vagrant.has_plugin?("vagrant-proxyconf")
     if http_proxy != nil
-       config.proxy.http = http_proxy
+      config.proxy.http = http_proxy
     end
     if https_proxy != nil
-       config.proxy.https = https_proxy
+      config.proxy.https = https_proxy
     end
     if no_proxy != nil
       config.proxy.no_proxy = no_proxy
