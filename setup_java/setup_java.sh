@@ -22,6 +22,10 @@ function setup_java {
         echo "Some Java version $VERSION has been installed and selected."
     else
         echo "ERROR: Unable to setup Java version $VERSION."
+
+        cat /etc/redhat-release
+        env | grep PATH
+
         return 1
     fi
 
@@ -68,7 +72,13 @@ function test_java_version {
     local COMMAND="$1"
     local VERSION="$2"
 
-    $COMMAND -version 2>&1 | grep -q 'version "1\.'$VERSION'\..*"'
+    if COMMAND_VERSION=$($COMMAND -version 2>&1); then
+        if echo "$COMMAND_VERSION" | grep -q 'version "1\.'$VERSION'\..*"'; then
+            return 0
+        fi
+    fi
+
+    return 1
 }
 
 if is_ubuntu; then
@@ -201,6 +211,10 @@ else
     }
 
     function select_installed_java_command {
-        sudo alternatives --set java "$1"
+        local JAVA_COMMAND="$1"
+        if [ "$(which java)" != "$JAVA_COMMAND" ]; then
+            sudo alternatives --set java "$JAVA_COMMAND"
+            [ "$(which java)" = "$JAVA_COMMAND" ]
+        fi
     }
 fi
