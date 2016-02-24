@@ -14,6 +14,8 @@ function setup_java {
     echo "Setup Java version: $VERSION"
     if test_java_version "$VERSION" && setup_java_env; then
         echo "Current Java version is already $VERSION."
+    elif select_java "$VERSION"; then
+        echo "Java version $VERSION has been selected."
     elif install_openjdk "$VERSION" && select_java "$VERSION"; then
         echo "OpenJDK version $VERSION has been installed and selected."
     elif install_other_java "$VERSION" && select_java "$VERSION"; then
