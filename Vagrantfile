@@ -63,6 +63,10 @@ Vagrant.configure(2) do |config|
     end
   end
 
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.scope = :machine
+  end
+
   # Provision project script
   config.vm.provision "shell" do |script|
     script.path = vm_provision_script
