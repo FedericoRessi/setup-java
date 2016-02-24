@@ -3,8 +3,8 @@
 ORACLE_JAVA_URL="http://download.oracle.com/otn-pub/java/jdk"
 ORACLE_JAVA7_URL="${LAST_ORACLE_JAVA7_URL:-$ORACLE_JAVA_URL/7u80-b15/jdk-7u80}"
 ORACLE_JAVA7_NAME="jdk1.7.0_80"
-ORACLE_JAVA8_URL="${LAST_ORACLE_JAVA8_URL:-$ORACLE_JAVA_URL/8u66-b17/jdk-8u66}"
-ORACLE_JAVA8_NAME="jdk1.8.0_66"
+ORACLE_JAVA8_URL="${LAST_ORACLE_JAVA8_URL:-$ORACLE_JAVA_URL/8u74-b02/jdk-8u74}"
+ORACLE_JAVA8_NAME="jdk1.8.0_74"
 
 
 function setup_java {
@@ -36,6 +36,13 @@ function setup_java_env() {
 
     export JAVA="$(readlink -f $JAVA_LINK)"
     export JAVA_HOME=$(echo $JAVA | sed "s:/bin/java::" | sed "s:/jre::")
+    if [ "$JAVA" != "$(readlink -f $(which java))" ]; then
+        export PATH="$(dirname $JAVA):$PATH"
+        if [ "$JAVA" != "$(readlink -f $(which java))" ]; then
+            echo "Unable to set $JAVA as current."
+            return 1
+        fi
+    fi
 
     echo "JAVA is: $JAVA"
     echo "JAVA_HOME is: $JAVA_HOME"
@@ -62,10 +69,10 @@ function select_java {
 function test_java_version {
     local COMMAND="${1:-${JAVA:-java}}"
     local ACTUAL_VERSION="'"$($COMMAND -version 2>&1 | head -n 1)"'"
-    local EXPECTED_VERSION="'"'java version "1.'$2'.'*'"'"'"
+    local EXPECTED_VERSION="'"*' version "1.'$2'.'*'"'"'"
 
     if [[ $ACTUAL_VERSION = $EXPECTED_VERSION ]]; then
-        echo "Found matching java version: $COMMAND_VERSION"
+        echo "Found matching java version: $ACTUAL_VERSION"
         return 0
     else
         return 1

@@ -12,9 +12,13 @@ source setup_java/setup_java.sh
 
 setup_java $JAVA_VERSION
 
-test_java_version $JAVA $JAVA_VERSION
+# verify that current java is the expected one
+test_java_version java $JAVA_VERSION
 
+# verify that installed java is current one
 [[ "$JAVA" == "$(readlink -f $(which java))" ]]
+
+# verify that $JAVA_HOME contains installed java
 find "$JAVA_HOME" -name java | grep "$JAVA"
 [[ "$(basename $JAVA_HOME)" != "jre" ]]
 
