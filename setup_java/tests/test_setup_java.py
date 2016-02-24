@@ -15,7 +15,6 @@ class SetupJavaTestCase(object):
 
     JAVA_VERSION = None
 
-    @unittest.skip('Under development.')
     def test_setup_java_on_ubuntu_trusty(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="trusty")
@@ -25,7 +24,6 @@ class SetupJavaTestCase(object):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="xenial")
 
-    @unittest.skip('Under development.')
     def test_setup_java_on_fedora_23(self):
         self._test_setup_java(
             java_version=self.JAVA_VERSION, vm_name="fedora23")

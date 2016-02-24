@@ -80,7 +80,12 @@ if is_ubuntu; then
     }
 else
     function yum_install {
-        yum install -y "$@"
+        local sudo
+        [[ "$(id -u)" == "0" ]] && sudo="env" || sudo="sudo"
+
+        $sudo DEBIAN_FRONTEND=noninteractive \
+            http_proxy=${http_proxy:-} https_proxy=${https_proxy:-} \
+            no_proxy=${no_proxy:-} \
+            yum install -y "$@"
     }
 fi
-
