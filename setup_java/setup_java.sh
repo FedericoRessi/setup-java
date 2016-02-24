@@ -57,7 +57,7 @@ function select_java {
     local COMMAND
 
     for COMMAND in $(list_java_commands); do
-        if test_java_version "$COMMAND" "$VERSION"; then
+        if test_java_version "$VERSION" "$COMMAND"; then
             if setup_java_env "$COMMAND"; then
                 return 0
             fi
@@ -69,9 +69,9 @@ function select_java {
 }
 
 function test_java_version {
-    local COMMAND="${1:-${JAVA:-java}}"
+    local EXPECTED_VERSION="'"*' version "1.'$1'.'*'"'"'"
+    local COMMAND="${2:-${JAVA:-java}}"
     local ACTUAL_VERSION="'"$($COMMAND -version 2>&1 | head -n 1)"'"
-    local EXPECTED_VERSION="'"*' version "1.'$2'.'*'"'"'"
 
     if [[ $ACTUAL_VERSION = $EXPECTED_VERSION ]]; then
         echo "Found matching java version: $ACTUAL_VERSION"
@@ -162,7 +162,7 @@ else
         fi
 
         local NEW_JAVA="/usr/java/$TARGET/jre/bin/java"
-        if test_java_version "$NEW_JAVA" "$VERSION"; then
+        if test_java_version "$VERSION" "$NEW_JAVA"; then
             if sudo alternatives --install /usr/bin/java java "$NEW_JAVA" 200000; then
                 return 0
             fi
@@ -189,7 +189,7 @@ else
                         ;;
                 esac
 
-                if test_java_version "$NEW_JAVA" "$VERSION"; then
+                if test_java_version "$VERSION" "$NEW_JAVA"; then
                     if sudo alternatives --install /usr/bin/java java "$NEW_JAVA" 200000; then
                         return 0
                     fi

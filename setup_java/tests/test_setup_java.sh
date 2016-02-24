@@ -13,7 +13,7 @@ source setup_java/setup_java.sh
 setup_java $JAVA_VERSION
 
 # verify that current java is the expected one
-test_java_version java $JAVA_VERSION
+test_java_version $JAVA_VERSION java
 
 # verify that installed java is current one
 [[ "$JAVA" == "$(readlink -f $(which java))" ]]
