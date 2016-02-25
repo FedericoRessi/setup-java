@@ -73,7 +73,7 @@ function test_java_version {
     local COMMAND="${2:-${JAVA:-java}}"
     local ACTUAL_VERSION="'"$($COMMAND -version 2>&1 | head -n 1)"'"
 
-    if [[ $ACTUAL_VERSION = $EXPECTED_VERSION ]]; then
+    if [[ $ACTUAL_VERSION == $EXPECTED_VERSION ]]; then
         echo "Found matching java version: $ACTUAL_VERSION"
         return 0
     else
@@ -137,7 +137,7 @@ else
 
     function install_openjdk {
         local VERSION="$1"
-        # Can't use yum_install because it would exit in case of failure
+
         yum_install java-1.$VERSION.*-openjdk-headless
     }
 
@@ -150,10 +150,10 @@ else
             local ARCH=linux-i586
         fi
 
-        if [[ "$VERSION" == 7 ]]; then
+        if [[ "$VERSION" == "7" ]]; then
             ORIGIN=$ORACLE_JAVA7_URL
             TARGET=$ORACLE_JAVA7_NAME
-        elif [[ "$VERSION" == 8 ]]; then
+        elif [[ "$VERSION" == "8" ]]; then
             ORIGIN=$ORACLE_JAVA8_URL
             TARGET=$ORACLE_JAVA8_NAME
         else
@@ -196,7 +196,6 @@ else
                 fi
 
                 echo "Unable to register installed java."
-
             else
                 echo "Unable to download java archive: $URL"
             fi
