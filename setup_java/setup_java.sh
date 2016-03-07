@@ -1,18 +1,17 @@
 #!/bin/bash
 
 ORACLE_JAVA_URL="http://download.oracle.com/otn-pub/java/jdk"
-ORACLE_JAVA7_URL="${LAST_ORACLE_JAVA7_URL:-$ORACLE_JAVA_URL/7u80-b15/jdk-7u80}"
+ORACLE_JAVA7_URL="${ORACLE_JAVA7_URL:-$ORACLE_JAVA_URL/7u80-b15/jdk-7u80}"
 ORACLE_JAVA7_NAME="jdk1.7.0_80"
-ORACLE_JAVA8_URL="${LAST_ORACLE_JAVA8_URL:-$ORACLE_JAVA_URL/8u74-b02/jdk-8u74}"
+ORACLE_JAVA8_URL="${ORACLE_JAVA8_URL:-$ORACLE_JAVA_URL/8u74-b02/jdk-8u74}"
 ORACLE_JAVA8_NAME="jdk1.8.0_74"
-
 
 function setup_java {
     # Java version 8 is the last stable one
     local VERSION="${1:-8}"
 
     echo "Setup Java version: $VERSION"
-    if test_java_version "$VERSION" && setup_java_env; then
+    if test_java_version java "$VERSION"; then
         echo "Current Java version is already $VERSION."
     elif select_java "$VERSION"; then
         echo "Java version $VERSION has been selected."
@@ -29,7 +28,7 @@ function setup_java {
 }
 
 function setup_java_env() {
-    local JAVA_COMMAND="${1:-${JAVA:-java}}"
+    local JAVA_COMMAND="${1:-java}"
 
     JAVA_LINK="$(which $JAVA_COMMAND)"
     if [[ "$JAVA_LINK" == "" ]]; then
@@ -38,18 +37,13 @@ function setup_java_env() {
 
     export JAVA="$(readlink -f $JAVA_LINK)"
     export JAVA_HOME=$(echo $JAVA | sed "s:/bin/java::" | sed "s:/jre::")
-    if [ "$JAVA" != "$(readlink -f $(which java))" ]; then
-        export PATH="$(dirname $JAVA):$PATH"
-        if [ "$JAVA" != "$(readlink -f $(which java))" ]; then
-            echo "Unable to set $JAVA as current."
-            return 1
-        fi
-    fi
 
     echo "JAVA is: $JAVA"
     echo "JAVA_HOME is: $JAVA_HOME"
     echo "Java version is:"
     $JAVA -version 2>&1
+
+    return 0
 }
 
 function select_java {
@@ -57,28 +51,23 @@ function select_java {
     local COMMAND
 
     for COMMAND in $(list_java_commands); do
-        if test_java_version "$VERSION" "$COMMAND"; then
-            if setup_java_env "$COMMAND"; then
-                return 0
+        if test_java_version "$COMMAND" "$VERSION"; then
+            if select_installed_java_command "$COMMAND"; then
+                if test_java_version java "$VERSION"; then
+                    return 0
+                fi
             fi
         fi
     done
 
-    echo 'Required java version not found.'
     return 1
 }
 
 function test_java_version {
-    local EXPECTED_VERSION="'"*' version "1.'$1'.'*'"'"'"
-    local COMMAND="${2:-${JAVA:-java}}"
-    local ACTUAL_VERSION="'"$($COMMAND -version 2>&1 | head -n 1)"'"
+    local COMMAND="$1"
+    local VERSION="$2"
 
-    if [[ $ACTUAL_VERSION == $EXPECTED_VERSION ]]; then
-        echo "Found matching java version: $ACTUAL_VERSION"
-        return 0
-    else
-        return 1
-    fi
+    $COMMAND -version 2>&1 | grep -q 'version "1\.'$VERSION'\..*"'
 }
 
 if is_ubuntu; then
@@ -86,6 +75,10 @@ if is_ubuntu; then
 
     function list_java_commands {
         update-alternatives --list java
+    }
+
+    function select_installed_java_command {
+        sudo update-alternatives --set java "$1"
     }
 
     function install_openjdk {
@@ -137,8 +130,8 @@ else
 
     function install_openjdk {
         local VERSION="$1"
-
-        yum_install java-1.$VERSION.*-openjdk-headless
+        # Can't use yum_install because it would exit in case of failure
+        sudo yum install -y java-1.$VERSION.*-openjdk-headless
     }
 
     function install_other_java {
@@ -162,7 +155,7 @@ else
         fi
 
         local NEW_JAVA="/usr/java/$TARGET/jre/bin/java"
-        if test_java_version "$VERSION" "$NEW_JAVA"; then
+        if test_java_version "$NEW_JAVA" "$VERSION"; then
             if sudo alternatives --install /usr/bin/java java "$NEW_JAVA" 200000; then
                 return 0
             fi
@@ -189,13 +182,14 @@ else
                         ;;
                 esac
 
-                if test_java_version "$VERSION" "$NEW_JAVA"; then
+                if test_java_version "$NEW_JAVA" "$VERSION"; then
                     if sudo alternatives --install /usr/bin/java java "$NEW_JAVA" 200000; then
                         return 0
                     fi
                 fi
 
                 echo "Unable to register installed java."
+
             else
                 echo "Unable to download java archive: $URL"
             fi
@@ -205,4 +199,7 @@ else
         return 1
     }
 
+    function select_installed_java_command {
+        sudo alternatives --set java "$1"
+    }
 fi
